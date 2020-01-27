@@ -1,5 +1,6 @@
 const path = require('path');
 const TSLintPlugin = require('tslint-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = env => ({
   entry: path.join(__dirname, '/src/index.tsx'),
@@ -11,12 +12,25 @@ module.exports = env => ({
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
+  // optimization: {
+  //   splitChunks: {
+  //     cacheGroups: {
+  //       styles: {
+  //         name: 'styles',
+  //         test: /\.css$/,
+  //         chunks: 'all',
+  //         enforce: true,
+  //       },
+  //     },
+  //   },
+  // },
   output: {
     path: path.join(__dirname, '/dist/umd'),
     filename: 'index.js',
     library: 'suomifi-ui-components',
     libraryTarget: 'umd',
     umdNamedDefine: true,
+    globalObject: 'this',
   },
   module: {
     rules: [
@@ -29,7 +43,7 @@ module.exports = env => ({
       // Used for global font-face imports
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        use: [ MiniCssExtractPlugin.loader, 'css-loader' ],
       },
       // Load images with 'file-loader'.
       {
@@ -50,6 +64,7 @@ module.exports = env => ({
     new TSLintPlugin({
       files: ['./src/**/*.tsx'],
     }),
+    new MiniCssExtractPlugin(),
   ],
   externals: {
     // this line is just to use the React dependency of our parent-project instead of using our own React.
@@ -58,6 +73,12 @@ module.exports = env => ({
       commonjs2: 'react',
       commonjs: 'react',
       amd: 'react',
+    },
+    'styled-components': {
+      root: 'styled-components',
+      commonjs: 'styled-components',
+      commonjs2: 'styled-components',
+      amd: 'styled-components',
     },
   },
 });
